@@ -6,12 +6,12 @@ Base = declarative_base()
 
 
 # Database models
-class User(Base):
+class Users(Base):
     __tablename__ = "Users"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False, unique=True)
-    email = Column(String, nullable=False)
+    email = Column(String, nullable=False, unique=True)
+    username = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
 
 class Trips(Base):

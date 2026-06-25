@@ -2,12 +2,20 @@ from pydantic import BaseModel
 from typing import Optional, List
 
 # Pydantic Model
-class trips(BaseModel):
+class UserTrip(BaseModel):
     start_odometer: int
     end_odometer: int
     trip_purpose: str
 
-class users(BaseModel):
+class UserCreate(BaseModel):
     email: str
-    name: str
+    username: str
     password: str
+
+class UserResponse(BaseModel):
+    id: int
+    email: str
+    username: str
+
+    class Config:
+        from_attributes = True
