@@ -2,22 +2,37 @@ from fastapi import FastAPI, status, Depends, HTTPException
 from sqlalchemy.orm import Session
 from passlib.hash import bcrypt
 from datetime import datetime, timedelta, timezone
+from fastapi.security import OAuth2PasswordBearer
 import jwt
 from .schemas import UserTrip, UserCreate, UserLogin, UserResponse
 from .db_models import Trips as db_trips, Users as db_users
 from .database import get_db
 from .config import secret_key
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/login")
 
 app = FastAPI()
 
+# jwt token for authentication
 def create_access_token(data: dict, expires_delta: timedelta):
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + expires_delta
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(payload=to_encode, key=secret_key, algorithm="HS256")
-    return encoded_jwt
+    return {'Access Token': encoded_jwt, 'token_type': 'bearer'}
 
+# authenticate current user
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    try:
+        decoded_jwt = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user = db.query(db_users).filter(db_users.id == decoded_jwt.get('user_id')).first()
+        if not user:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not authorized")
+        return user
+    except jwt.InvalidTokenError as e:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid Authentication Token")
+
+        
 
 # Create an account
 @app.post("/api/register", response_model=UserResponse)
@@ -37,6 +52,7 @@ async def register_account(account: UserCreate, db: Session = Depends(get_db)):
     db.refresh(new_account)
     return new_account
 
+# login 
 @app.post("/api/login")
 async def login(credentials: UserLogin, db: Session = Depends(get_db)):
     user = db.query(db_users).filter(db_users.email == credentials.email).first()
@@ -44,7 +60,7 @@ async def login(credentials: UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     
     access_token = create_access_token(data={"user_id": user.id}, expires_delta=timedelta(minutes=45))
-    return {"access_token": access_token, "token_type": "bearer"}
+    return access_token
 
 
 # Create a trip
