@@ -32,8 +32,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     except jwt.InvalidTokenError as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid Authentication Token")
 
-        
-
+    
 # Create an account
 @app.post("/api/register", response_model=UserResponse)
 async def register_account(account: UserCreate, db: Session = Depends(get_db)):
@@ -79,8 +78,8 @@ async def create_UserTrip(trips_request: UserTrip, db: Session = Depends(get_db)
 
 # todo -- get all trips
 @app.get("/api/trips")
-async def get_all_UserTrip(db: Session = Depends(get_db)):
-    trip_obj = db.query(db_trips).filter(db_trips.user_id == user_id).all()
+async def get_all_UserTrip(db: Session = Depends(get_db), user = Depends(get_current_user)):
+    trip_obj = db.query(db_trips).filter(db_trips.user_id == user.id).all()
     return trip_obj
 
 # get a specific trip

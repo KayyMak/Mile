@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session, declarative_base
 
@@ -16,6 +16,7 @@ class Users(Base):
 
 class Trips(Base):
     __tablename__ = "Trips"
+    user_id = Column(Integer, ForeignKey("Users.id", ondelete="CASCADE"))
     id = Column(Integer, primary_key=True, index=True)
     start_odometer = Column(Integer, nullable=False)
     end_odometer = Column(Integer, nullable=False)
