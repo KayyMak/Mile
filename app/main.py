@@ -2,14 +2,14 @@ from fastapi import FastAPI, status, Depends, HTTPException
 from sqlalchemy.orm import Session
 from passlib.hash import bcrypt
 from datetime import datetime, timedelta, timezone
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, OAuth2PasswordRequestForm
 import jwt
 from .schemas import UserTrip, UserCreate, UserLogin, UserResponse
 from .db_models import Trips as db_trips, Users as db_users
 from .database import get_db
 from .config import secret_key
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/login")
+security = HTTPBearer()
 
 app = FastAPI()
 
@@ -22,7 +22,8 @@ def create_access_token(data: dict, expires_delta: timedelta):
     return {'Access Token': encoded_jwt, 'token_type': 'bearer'}
 
 # authenticate current user
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)):
+    token = credentials.credentials
     try:
         decoded_jwt = jwt.decode(token, secret_key, algorithms=['HS256'])
         user = db.query(db_users).filter(db_users.id == decoded_jwt.get('user_id')).first()
@@ -53,20 +54,21 @@ async def register_account(account: UserCreate, db: Session = Depends(get_db)):
 
 # login 
 @app.post("/api/login")
-async def login(credentials: UserLogin, db: Session = Depends(get_db)):
-    user = db.query(db_users).filter(db_users.email == credentials.email).first()
+async def login(credentials: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = db.query(db_users).filter(db_users.email == credentials.username).first()
     if not user or not bcrypt.verify(credentials.password, user.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
-    
+
     access_token = create_access_token(data={"user_id": user.id}, expires_delta=timedelta(minutes=45))
-    return access_token
+    return {'access_token': access_token, 'token_type': 'bearer'}
 
 
 # Create a trip
 @app.post("/api/trips")
-async def create_UserTrip(trips_request: UserTrip, db: Session = Depends(get_db)):
+async def create_UserTrip(trips_request: UserTrip, db: Session = Depends(get_db), user: db_users = Depends(get_current_user)):
     # Creates a UserTrip model object and then adds to the database
     new_trip = db_trips(
+        user_id=user.id,
         start_odometer=trips_request.start_odometer, 
         end_odometer=trips_request.end_odometer, 
         purpose=trips_request.trip_purpose
