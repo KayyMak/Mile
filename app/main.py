@@ -84,7 +84,15 @@ async def get_all_UserTrip(db: Session = Depends(get_db), user = Depends(get_cur
     trip_obj = db.query(db_trips).filter(db_trips.user_id == user.id).all()
     return trip_obj
 
-# get a specific trip
-@app.get("/api/trips/{id}")
-async def get_trip():
+# delete a trip
+@app.delete("/api/trips/{id}")
+async def delete_UserTrip(id: int, db: Session = Depends(get_db), user = Depends(get_current_user)):
+    del_trip = db.query(db_trips).filter(db_trips.id == id, db_trips.user_id == user.id).delete()
+    if not del_trip:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+    db.commit()
+
+# edit a trip
+@app.put("/api/trips/{id}")
+async def edit_UserTrip(db: Session = Depends(get_db), user = Depends(get_current_user)):
     pass
