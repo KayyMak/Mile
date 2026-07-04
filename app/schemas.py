@@ -5,7 +5,7 @@ from typing import Optional, List
 class UserTrip(BaseModel):
     start_odometer: int
     end_odometer: int
-    trip_purpose: str
+    purpose: str
 
 class UserCreate(BaseModel):
     email: str
