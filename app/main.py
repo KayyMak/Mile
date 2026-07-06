@@ -4,7 +4,7 @@ from passlib.hash import bcrypt
 from datetime import datetime, timedelta, timezone
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, OAuth2PasswordRequestForm
 import jwt
-from .schemas import UserTrip, UserCreate, UserLogin, UserResponse
+from .schemas import UserTrip, UserCreate, UserLogin, UserResponse, UpdateTrip
 from .db_models import Trips as db_trips, Users as db_users
 from .database import get_db
 from .config import secret_key
@@ -94,11 +94,11 @@ async def delete_UserTrip(id: int, db: Session = Depends(get_db), user = Depends
 
 # edit a trip
 @app.patch("/api/trips/{id}")
-async def edit_UserTrip(id: int, trip_sent: UserTrip, db: Session = Depends(get_db), user = Depends(get_current_user)):
+async def edit_UserTrip(id: int, trip_sent: UpdateTrip, db: Session = Depends(get_db), user = Depends(get_current_user)):
     edit_trip = trip_sent.model_dump(exclude_unset=True)
     # check if request body is empty
     if not edit_trip:
-        raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail="Empty request body")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Empty request body")
 
     trip_obj = db.query(db_trips).filter(db_trips.user_id == user.id, db_trips.id == id).first()
     # check if trip exists
