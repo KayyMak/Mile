@@ -95,16 +95,15 @@ async def delete_UserTrip(id: int, db: Session = Depends(get_db), user = Depends
 # edit a trip
 @app.patch("/api/trips/{id}")
 async def edit_UserTrip(id: int, trip_sent: UserTrip, db: Session = Depends(get_db), user = Depends(get_current_user)):
-    # check if trip exists
-    if not trip_sent:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Trip not found")
-
     edit_trip = trip_sent.model_dump(exclude_unset=True)
     # check if request body is empty
     if not edit_trip:
         raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail="Empty request body")
-    
+
     trip_obj = db.query(db_trips).filter(db_trips.user_id == user.id, db_trips.id == id).first()
+    # check if trip exists
+    if not trip_obj:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Trip not found")
     
     for category in edit_trip:
         setattr(trip_obj, category, edit_trip[category])
