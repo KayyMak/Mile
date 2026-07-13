@@ -10,7 +10,7 @@ class UserTrip(BaseModel):
 class UpdateTrip(BaseModel):
     start_odometer: Optional[int] = None
     end_odometer: Optional[int] = None
-    purpose: Optional[int] = None
+    purpose: Optional[str] = None
     
 class UserCreate(BaseModel):
     email: str
