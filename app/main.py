@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from passlib.hash import bcrypt
 from datetime import datetime, timedelta, timezone
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, OAuth2PasswordRequestForm
+from fastapi.middleware.cors import CORSMiddleware
 import jwt
 from .schemas import UserTrip, UserCreate, UserLogin, UserResponse, UpdateTrip
 from .db_models import Trips as db_trips, Users as db_users
@@ -12,6 +13,16 @@ from .config import secret_key
 security = HTTPBearer()
 
 app = FastAPI()
+
+# Defining the domains that can access this API
+origins = ['http://localhost:3000']
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=['*'],
+    allow_headers=['*']
+)
 
 # jwt token for authentication
 def create_access_token(data: dict, expires_delta: timedelta):
