@@ -16,5 +16,17 @@ async function request(path, options = {}) {
     return;
   }
 
-   return data;
+  return data;
+}
+
+async function authRequest(path, options = {}) {
+  const token = localStorage.getItem("accessToken");
+  if (!token) {
+    const error = new Error("No access token found");
+    error.status = 401;
+    throw error;
+  }
+  const mergedOptions = {...options};
+  mergedOptions.headers = {...mergedOptions.headers, Authorization: `Bearer ${token}`};
+  return request(path, mergedOptions);
 }
