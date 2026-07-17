@@ -2,7 +2,7 @@ from fastapi import FastAPI, status, Depends, HTTPException
 from sqlalchemy.orm import Session
 from passlib.hash import bcrypt
 from datetime import datetime, timedelta, timezone
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, OAuth2PasswordRequestForm
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 import jwt
 from .schemas import UserTrip, UserCreate, UserLogin, UserResponse, UpdateTrip
@@ -63,10 +63,10 @@ async def register_account(account: UserCreate, db: Session = Depends(get_db)):
     db.refresh(new_account)
     return new_account
 
-# login 
+# login
 @app.post("/api/login")
-async def login(credentials: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = db.query(db_users).filter(db_users.email == credentials.username).first()
+async def login(credentials: UserLogin, db: Session = Depends(get_db)):
+    user = db.query(db_users).filter(db_users.email == credentials.email).first()
     if not user or not bcrypt.verify(credentials.password, user.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
