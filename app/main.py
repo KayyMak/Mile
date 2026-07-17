@@ -30,7 +30,7 @@ def create_access_token(data: dict, expires_delta: timedelta):
     expire = datetime.now(timezone.utc) + expires_delta
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(payload=to_encode, key=secret_key, algorithm="HS256")
-    return {'Access Token': encoded_jwt, 'token_type': 'bearer'}
+    return encoded_jwt
 
 # authenticate current user
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)):
