@@ -30,3 +30,28 @@ async function authRequest(path, options = {}) {
   mergedOptions.headers = {...mergedOptions.headers, Authorization: `Bearer ${token}`};
   return request(path, mergedOptions);
 }
+
+async function register(credentials) {
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(credentials)
+  };
+  return request('/api/register', options);
+}
+
+async function login(credentials) {
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(credentials)
+  };
+
+  const response = await request('/api/login', options);
+  localStorage.setItem("accessToken", response.access_token);
+  return response;
+}
