@@ -89,7 +89,7 @@ async def create_UserTrip(trips_request: UserTrip, db: Session = Depends(get_db)
     db.refresh(new_trip)
     return new_trip
 
-# todo -- get all trips
+# get all trips
 @app.get("/api/trips")
 async def get_all_UserTrip(db: Session = Depends(get_db), user = Depends(get_current_user)):
     trip_obj = db.query(db_trips).filter(db_trips.user_id == user.id).all()
