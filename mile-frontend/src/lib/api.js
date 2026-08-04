@@ -55,3 +55,6 @@ async function login(credentials) {
   localStorage.setItem("accessToken", response.access_token);
   return response;
 }
+
+
+export { request, authRequest, register, login };
