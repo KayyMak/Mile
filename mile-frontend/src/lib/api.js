@@ -72,3 +72,5 @@ async function getTrips() {
   const response = await authRequest('/api/trips');
   return response
 }
+
+export { request, authRequest, register, login };

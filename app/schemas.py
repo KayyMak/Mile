@@ -2,12 +2,12 @@ from pydantic import BaseModel
 from typing import Optional, List
 
 # Pydantic Model
-class UserTrip(BaseModel):
+class TripCreate(BaseModel):
     start_odometer: int
     end_odometer: int
     purpose: str
 
-class UpdateTrip(BaseModel):
+class TripUpdate(BaseModel):
     start_odometer: Optional[int] = None
     end_odometer: Optional[int] = None
     purpose: Optional[str] = None
