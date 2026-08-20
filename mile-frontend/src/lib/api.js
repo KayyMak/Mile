@@ -73,4 +73,24 @@ async function getTrips() {
   return response
 }
 
-export { request, authRequest, register, login };
+async function deleteTrip(tripID) {
+  const options = {
+    method: 'DELETE',
+  };
+  const response = await authRequest(`/api/trips/${tripID}`, options);
+  return response
+}
+
+async function editTrip({tripID, ...updates}) {
+  const options = {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(updates)
+  };
+  const response = await authRequest(`/api/trips/${tripID}`, options);
+  return response
+}
+
+export { request, authRequest, register, login, createTrip, getTrips, deleteTrip, editTrip};
