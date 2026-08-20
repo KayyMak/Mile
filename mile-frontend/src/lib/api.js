@@ -55,3 +55,20 @@ async function login(credentials) {
   localStorage.setItem("accessToken", response.access_token);
   return response;
 }
+
+async function createTrip(tripDetails) {
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(tripDetails)
+  };
+  const response = await authRequest('/api/trips', options);
+  return response
+}
+
+async function getTrips() {
+  const response = await authRequest('/api/trips');
+  return response
+}
