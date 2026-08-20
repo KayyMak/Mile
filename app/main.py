@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 import jwt
-from .schemas import UserTrip, UserCreate, UserLogin, UserResponse, UpdateTrip
+from .schemas import TripCreate, TripUpdate, UserCreate, UserLogin, UserResponse
 from .db_models import Trips as db_trips, Users as db_users
 from .database import get_db
 from .config import secret_key
@@ -76,48 +76,48 @@ async def login(credentials: UserLogin, db: Session = Depends(get_db)):
 
 # Create a trip
 @app.post("/api/trips")
-async def create_UserTrip(trips_request: UserTrip, db: Session = Depends(get_db), user: db_users = Depends(get_current_user)):
-    # Creates a UserTrip model object and then adds to the database
+async def create_trip(trip_data: TripCreate, db: Session = Depends(get_db), user: db_users = Depends(get_current_user)):
+    # Creates a Trips model object and then adds to the database
     new_trip = db_trips(
         user_id=user.id,
-        start_odometer=trips_request.start_odometer, 
-        end_odometer=trips_request.end_odometer, 
-        purpose=trips_request.purpose
+        start_odometer=trip_data.start_odometer,
+        end_odometer=trip_data.end_odometer,
+        purpose=trip_data.purpose
         )
     db.add(new_trip)
     db.commit()
     db.refresh(new_trip)
     return new_trip
 
-# todo -- get all trips
+# get all trips
 @app.get("/api/trips")
-async def get_all_UserTrip(db: Session = Depends(get_db), user = Depends(get_current_user)):
-    trip_obj = db.query(db_trips).filter(db_trips.user_id == user.id).all()
-    return trip_obj
+async def list_trips(db: Session = Depends(get_db), user = Depends(get_current_user)):
+    trips = db.query(db_trips).filter(db_trips.user_id == user.id).all()
+    return trips
 
 # delete a trip
 @app.delete("/api/trips/{id}")
-async def delete_UserTrip(id: int, db: Session = Depends(get_db), user = Depends(get_current_user)):
-    del_trip = db.query(db_trips).filter(db_trips.id == id, db_trips.user_id == user.id).delete()
-    if not del_trip:
+async def delete_trip(id: int, db: Session = Depends(get_db), user = Depends(get_current_user)):
+    deleted_count = db.query(db_trips).filter(db_trips.id == id, db_trips.user_id == user.id).delete()
+    if not deleted_count:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     db.commit()
 
 # edit a trip
 @app.patch("/api/trips/{id}")
-async def edit_UserTrip(id: int, trip_sent: UpdateTrip, db: Session = Depends(get_db), user = Depends(get_current_user)):
-    edit_trip = trip_sent.model_dump(exclude_unset=True)
+async def update_trip(id: int, trip_update: TripUpdate, db: Session = Depends(get_db), user = Depends(get_current_user)):
+    updates = trip_update.model_dump(exclude_unset=True)
     # check if request body is empty
-    if not edit_trip:
+    if not updates:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Empty request body")
 
-    trip_obj = db.query(db_trips).filter(db_trips.user_id == user.id, db_trips.id == id).first()
+    trip = db.query(db_trips).filter(db_trips.user_id == user.id, db_trips.id == id).first()
     # check if trip exists
-    if not trip_obj:
+    if not trip:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Trip not found")
-    
-    for category in edit_trip:
-        setattr(trip_obj, category, edit_trip[category])
+
+    for field, value in updates.items():
+        setattr(trip, field, value)
     db.commit()
-    db.refresh(trip_obj)
-    return trip_obj
+    db.refresh(trip)
+    return trip
