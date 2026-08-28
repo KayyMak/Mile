@@ -81,7 +81,7 @@ async function deleteTrip(tripID) {
   return response
 }
 
-async function editTrip({tripID, ...updates}) {
+async function updateTrip({tripID, ...updates}) {
   const options = {
     method: 'PATCH',
     headers: {
@@ -93,4 +93,4 @@ async function editTrip({tripID, ...updates}) {
   return response
 }
 
-export { request, authRequest, register, login, createTrip, getTrips, deleteTrip, editTrip};
+export { request, authRequest, register, login, createTrip, getTrips, deleteTrip, updateTrip};
