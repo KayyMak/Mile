@@ -2,17 +2,20 @@
 
 import { useState } from 'react';
 import { login } from '../../lib/api';
+import { useRouter } from 'next/navigation';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const router = useRouter();
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
     try {
       await login({ email, password });
+      router.push("/");
     } catch (err) {
       setError(err.message);
     }
