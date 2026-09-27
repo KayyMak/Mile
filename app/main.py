@@ -100,7 +100,7 @@ async def list_trips(db: Session = Depends(get_db), user = Depends(get_current_u
 async def delete_trip(id: int, db: Session = Depends(get_db), user = Depends(get_current_user)):
     deleted_count = db.query(db_trips).filter(db_trips.id == id, db_trips.user_id == user.id).delete()
     if not deleted_count:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Account not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Trip not found")
     db.commit()
 
 # edit a trip
