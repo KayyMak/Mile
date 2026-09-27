@@ -29,7 +29,7 @@ Everything currently lives in `app/main.py` — routes, JWT auth logic, and busi
 - `app/config.py` — loads settings from `.env` via `python-dotenv`, exposes them as module-level variables (`db_user`, `db_password`, `secret_key`, etc.). Other modules import these directly rather than using a settings object.
 - `app/database.py` — SQLAlchemy `engine`/`sessionLocal` setup and the `get_db` dependency (yields a session per-request, closes in `finally`).
 - `app/db_models.py` — SQLAlchemy ORM models (`Users`, `Trips`). `Trips.user_id` is a foreign key to `Users.id` with `ondelete="CASCADE"`.
-- `app/schemas.py` — Pydantic request/response models (`UserCreate`, `UserLogin`, `UserResponse`, `UserTrip`, `UpdateTrip`). `UserResponse` uses `from_attributes = True` to serialize from ORM objects.
+- `app/schemas.py` — Pydantic request/response models (`UserCreate`, `UserLogin`, `UserResponse`, `TripCreate`, `TripUpdate`). `UserResponse` uses `from_attributes = True` to serialize from ORM objects.
 - `alembic/` — migrations. `alembic/env.py` builds the DB URL from `app/config.py` values (not from `alembic.ini`) and targets `app.db_models.Base.metadata` for autogenerate.
 
 ### Auth flow
@@ -41,5 +41,4 @@ Everything currently lives in `app/main.py` — routes, JWT auth logic, and busi
 
 ### Known inconsistencies to be aware of
 
-- `UpdateTrip.purpose` in `schemas.py` is typed `Optional[int]` while `UserTrip.purpose` and the `Trips.purpose` column are strings — likely a bug, not intentional.
 - `app/routers/users.py` and `app/routers/trips.py` are empty; don't assume route logic lives there.
