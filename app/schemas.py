@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 
 # Pydantic Model
@@ -13,12 +13,12 @@ class TripUpdate(BaseModel):
     purpose: Optional[str] = None
     
 class UserCreate(BaseModel):
-    email: str
+    email: EmailStr
     username: str
     password: str
 
 class UserLogin(BaseModel):
-    email: str
+    email: EmailStr
     password: str
 
 class UserResponse(BaseModel):

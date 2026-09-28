@@ -91,21 +91,21 @@ async def create_trip(trip_data: TripCreate, db: Session = Depends(get_db), user
 
 # get all trips
 @app.get("/api/trips")
-async def list_trips(db: Session = Depends(get_db), user = Depends(get_current_user)):
+async def list_trips(db: Session = Depends(get_db), user: db_users = Depends(get_current_user)):
     trips = db.query(db_trips).filter(db_trips.user_id == user.id).all()
     return trips
 
 # delete a trip
 @app.delete("/api/trips/{id}")
-async def delete_trip(id: int, db: Session = Depends(get_db), user = Depends(get_current_user)):
+async def delete_trip(id: int, db: Session = Depends(get_db), user: db_users = Depends(get_current_user)):
     deleted_count = db.query(db_trips).filter(db_trips.id == id, db_trips.user_id == user.id).delete()
     if not deleted_count:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Trip not found")
     db.commit()
 
 # edit a trip
 @app.patch("/api/trips/{id}")
-async def update_trip(id: int, trip_update: TripUpdate, db: Session = Depends(get_db), user = Depends(get_current_user)):
+async def update_trip(id: int, trip_update: TripUpdate, db: Session = Depends(get_db), user: db_users = Depends(get_current_user)):
     updates = trip_update.model_dump(exclude_unset=True)
     # check if request body is empty
     if not updates:

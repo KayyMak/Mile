@@ -2,3 +2,8 @@
 .env
 __pycache__/
 *.pyc
+
+# claude code tooling/skills, not project code
+.agents/
+.claude/
+skills-lock.json
