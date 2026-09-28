@@ -1,12 +1,5 @@
 'use client';
 
-<<<<<<< HEAD
-export default function Login() {
-  return (
-    <div>
-      {/* TODO: login form */}
-    </div>
-=======
 import { useState } from 'react';
 import { login } from '../../lib/api';
 import { useRouter } from 'next/navigation';
@@ -37,6 +30,5 @@ export default function Login() {
       {error && <p>{error}</p>}
     </div>
     </form>
->>>>>>> c1bca9d8d94cd718c83068d4d6ad15acecc7c379
   );
 }
