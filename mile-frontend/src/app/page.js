@@ -1,63 +1,50 @@
-import Image from "next/image";
+import Link from 'next/link';
+import Brand from '@/components/Brand';
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.js file.
+    <div className="min-h-screen bg-paper">
+      <header className="mx-auto flex max-w-7xl items-center justify-between px-5 py-6 sm:px-8 lg:px-12">
+        <Brand />
+        <Link href="/login" className="text-sm font-medium text-ink underline decoration-line underline-offset-8 transition-colors hover:text-olive">
+          Log in
+        </Link>
+      </header>
+
+      <main className="mx-auto grid max-w-7xl gap-12 px-5 pb-12 pt-12 sm:px-8 sm:pt-20 lg:grid-cols-[1fr_0.9fr] lg:items-center lg:gap-20 lg:px-12 lg:pb-24 lg:pt-24">
+        <div className="max-w-2xl">
+          <p className="mb-6 text-xs font-semibold uppercase tracking-[0.22em] text-olive">The simpler way to keep moving</p>
+          <h1 className="text-[clamp(3.5rem,9vw,7rem)] font-light leading-[0.98] tracking-[-0.075em] text-ink">
+            Every trip,<br /><span className="text-olive">in its place.</span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="mt-8 max-w-md text-lg leading-relaxed text-muted">
+            Record your mileage in moments. Find the details whenever you need them.
           </p>
+          <div className="mt-10 flex flex-wrap items-center gap-5">
+            <Link href="/register" className="inline-flex min-h-13 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-surface transition-colors hover:bg-olive focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-olive">
+              Get started <span className="ml-5" aria-hidden="true">↗</span>
+            </Link>
+            <Link href="/login" className="text-sm font-medium text-ink underline decoration-line underline-offset-8 hover:text-olive">
+              I have an account
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="relative min-h-[420px] overflow-hidden rounded-[2rem] bg-[#dce3d4] p-5 sm:min-h-[520px] sm:p-10 lg:min-h-[600px]" aria-hidden="true">
+          <div className="absolute -right-24 -top-24 size-80 rounded-full border border-white/55 sm:size-[30rem]" />
+          <div className="absolute -bottom-44 -left-28 size-[26rem] rounded-full border border-white/60 sm:size-[38rem]" />
+          <div className="absolute left-[46%] top-[-10%] h-[130%] w-24 -rotate-[29deg] rounded-full border border-dashed border-white/80 sm:w-32" />
+          <div className="relative z-10 flex h-full min-h-[380px] flex-col justify-between rounded-[1.5rem] border border-white/55 bg-white/55 p-7 shadow-[0_20px_70px_rgba(32,40,32,0.08)] backdrop-blur-sm sm:min-h-[440px] sm:p-9 lg:min-h-[520px]">
+            <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-muted">
+              <span>Your journey</span><span>Mile</span>
+            </div>
+            <div>
+              <span className="mb-5 block h-px w-12 bg-olive" />
+              <p className="text-[clamp(2.5rem,5vw,4.5rem)] font-light leading-tight tracking-[-0.065em] text-ink">A little less<br />to remember.</p>
+              <p className="mt-5 max-w-xs text-sm leading-relaxed text-muted">A clear record for the miles that matter.</p>
+            </div>
+            <div className="flex items-center gap-3 text-xs font-medium uppercase tracking-[0.15em] text-ink"><span className="size-2 rounded-full bg-olive" /> Ready when you are</div>
+          </div>
         </div>
       </main>
     </div>
