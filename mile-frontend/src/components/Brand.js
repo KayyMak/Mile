@@ -2,11 +2,8 @@ import Link from 'next/link';
 
 export default function Brand() {
   return (
-    <Link href="/" className="inline-flex items-center gap-2.5 text-xl font-semibold tracking-[-0.06em] text-ink" aria-label="Mile home">
-      <span className="flex size-8 items-center justify-center rounded-full bg-ink text-surface" aria-hidden="true">
-        <span className="mb-1 text-[24px] font-light leading-none">m</span>
-      </span>
-      mile<span className="-ml-2 text-olive">.</span>
+    <Link href="/" className="inline-flex items-center text-[1.75rem] font-semibold leading-none tracking-[-0.07em] text-ink transition-colors hover:text-olive focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-olive" aria-label="Mile home">
+      mile
     </Link>
   );
 }
