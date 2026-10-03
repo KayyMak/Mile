@@ -6,10 +6,15 @@ import { createTrip, getTrips } from '@/lib/api';
 import { SaveTrip } from '@/components/TripForm';
 import Brand from '@/components/Brand';
 
+const editInputClass = 'mt-2 block w-full rounded-xl border border-line bg-surface px-3 py-2 text-sm text-ink outline-none focus:border-olive focus:ring-2 focus:ring-olive/15';
+
 export default function Trips() {
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [editingTripId, setEditingTripId] = useState(null);
+  const [draft, setDraft] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -33,6 +38,23 @@ export default function Trips() {
   async function onSubmitTrip(trip) {
     const newTrip = await createTrip(trip);
     setTrips((previousTrips) => [...previousTrips, newTrip]);
+  }
+
+  function handleEdit(trip) {
+    if (editingTripId !== null) return;
+
+    setDraft({
+      start_odometer: String(trip.start_odometer),
+      end_odometer: String(trip.end_odometer),
+      purpose: trip.purpose ?? '',
+    });
+    setEditingTripId(trip.id);
+    setOpenMenuId(null);
+  }
+
+  function handleCancelEdit() {
+    setEditingTripId(null);
+    setDraft(null);
   }
 
   function handleLogout() {
@@ -97,12 +119,91 @@ export default function Trips() {
               {!loading && !error && trips.length > 0 && (
                 <ul className="divide-y divide-line">
                   {recentTrips.map((trip) => (
-                    <li key={trip.id} className="flex items-center justify-between gap-4 py-5">
+                    <li key={trip.id} className="py-5">
+                      {editingTripId === trip.id ? (
+                        <div aria-label={`Edit trip ${trip.id}`}>
+                          <p className="mb-4 text-sm font-medium text-olive">Editing trip</p>
+                          <div className="grid gap-4 sm:grid-cols-2">
+                            <div>
+                              <label htmlFor={`edit-start-${trip.id}`} className="text-sm font-medium text-ink">Start odometer (mi)</label>
+                              <input
+                                id={`edit-start-${trip.id}`}
+                                type="number" inputMode="numeric" min="0" step="1"
+                                value={draft.start_odometer}
+                                onChange={(event) => setDraft((previousDraft) => ({ ...previousDraft, start_odometer: event.target.value }))}
+                                className={editInputClass}
+                                autoFocus
+                              />
+                            </div>
+                            <div>
+                              <label htmlFor={`edit-end-${trip.id}`} className="text-sm font-medium text-ink">End odometer (mi)</label>
+                              <input
+                                id={`edit-end-${trip.id}`}
+                                type="number" inputMode="numeric" min="0" step="1"
+                                value={draft.end_odometer}
+                                onChange={(event) => setDraft((previousDraft) => ({ ...previousDraft, end_odometer: event.target.value }))}
+                                className={editInputClass}
+                              />
+                            </div>
+                          </div>
+                          <div className="mt-4">
+                            <label htmlFor={`edit-purpose-${trip.id}`} className="text-sm font-medium text-ink">Purpose (optional)</label>
+                            <input
+                              id={`edit-purpose-${trip.id}`}
+                              type="text"
+                              value={draft.purpose}
+                              onChange={(event) => setDraft((previousDraft) => ({ ...previousDraft, purpose: event.target.value }))}
+                              className={editInputClass}
+                            />
+                          </div>
+                          <div className="mt-5 flex gap-3">
+                            {/* Saving is enabled in the next step after validation and change detection. */}
+                            <button type="button" disabled className="rounded-full bg-ink px-4 py-2 text-sm font-medium text-surface disabled:cursor-not-allowed disabled:opacity-60">Save changes</button>
+                            <button type="button" onClick={handleCancelEdit} className="rounded-full border border-line px-4 py-2 text-sm font-medium text-ink hover:border-olive focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-olive">Cancel</button>
+                          </div>
+                        </div>
+                      ) : (
+                      <div className="flex items-center justify-between gap-4">
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-ink">{trip.purpose || 'Untitled trip'}</p>
                         <p className="mt-1 text-xs text-muted">{trip.start_odometer.toLocaleString()} → {trip.end_odometer.toLocaleString()} mi</p>
                       </div>
-                      <p className="shrink-0 font-mono text-lg tracking-[-0.05em] tabular-nums text-ink">+{(trip.end_odometer - trip.start_odometer).toLocaleString()} <span className="font-sans text-xs font-normal tracking-normal text-muted">mi</span></p>
+                      <div className="flex shrink-0 items-center gap-2">
+                        <p className="font-mono text-lg tracking-[-0.05em] tabular-nums text-ink">+{(trip.end_odometer - trip.start_odometer).toLocaleString()} <span className="font-sans text-xs font-normal tracking-normal text-muted">mi</span></p>
+                        <div
+                          className="relative"
+                          onBlur={(event) => {
+                            if (!event.currentTarget.contains(event.relatedTarget)) {
+                              setOpenMenuId(null);
+                            }
+                          }}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Escape') {
+                              setOpenMenuId(null);
+                            }
+                          }}
+                        >
+                          <button
+                            type="button"
+                            aria-label={`Actions for trip ${trip.id}`}
+                            aria-expanded={openMenuId === trip.id}
+                            aria-controls={`trip-actions-${trip.id}`}
+                            onClick={() => setOpenMenuId((currentId) => currentId === trip.id ? null : trip.id)}
+                            className="flex size-10 items-center justify-center rounded-full text-ink transition-colors hover:bg-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-olive"
+                          >
+                            <span aria-hidden="true" className="text-2xl">⋮</span>
+                          </button>
+                          {openMenuId === trip.id && (
+                            <div id={`trip-actions-${trip.id}`} className="absolute right-0 top-full z-10 mt-1 w-32 rounded-xl border border-line bg-surface p-1 shadow-lg">
+                              <button type="button" onClick={() => handleEdit(trip)} disabled={editingTripId !== null && editingTripId !== trip.id} className="block w-full rounded-lg px-4 py-2 text-left text-sm text-ink hover:bg-paper focus-visible:outline-2 focus-visible:outline-olive disabled:cursor-not-allowed disabled:opacity-60">Edit</button>
+                              {/* Delete is enabled in a later step with confirmation. */}
+                              <button type="button" disabled className="block w-full rounded-lg px-4 py-2 text-left text-sm text-red-700 disabled:cursor-not-allowed disabled:opacity-60">Delete</button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      </div>
+                      )}
                     </li>
                   ))}
                 </ul>
